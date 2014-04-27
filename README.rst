@@ -19,7 +19,12 @@ It assumes the zone is correctly configured on the server part to accept updates
 You can add the ``-p5`` option to check for IP every 5 minutes and only send update if it changed
 
 
+You might wish to checkout the `<MANUAL.rst>`_ file to see how to set up your DNS server
+
+
 Since the script needs the nsupdate_ binary, you'll need to install it:
 
 - Debian/Ubuntu: ``apt-get install dnsutils``
 - MacOS: ``brew install bind``
+
+
