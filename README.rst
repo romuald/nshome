@@ -7,6 +7,7 @@ It sends a dynamic update to update a specific record within your DNS zone (usin
 
 .. _nsupdate: http://ftp.isc.org/isc/bind9/cur/9.8/doc/arm/man.nsupdate.html
 
+
 Sample usage::
 
   nshome -k Khome.example.com.private -n home.example.com  -s ns.example.com
@@ -16,3 +17,9 @@ This will send an update to *ns.example.com* to overwrite *home.example.com* to 
 It assumes the zone is correctly configured on the server part to accept updates to *example.com* with the *home.examplecom.private* key
 
 You can add the ``-p5`` option to check for IP every 5 minutes and only send update if it changed
+
+
+Since the script needs the nsupdate_ binary, you'll need to install it:
+
+- Debian/Ubuntu: ``apt-get install dnsutils``
+- MacOS: ``brew install bind``
