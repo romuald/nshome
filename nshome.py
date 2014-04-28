@@ -20,7 +20,8 @@ IPHOST = 'ip.bit.fr'
 SCRIPT = """SERVER %(server)s
 UPDATE DELETE %(name)s A
 UPDATE ADD %(name)s %(ttl)d A %(ip)s
-%(show)sSEND"""
+%(show)sSEND
+"""
 
 def parseargs():
     parser = ArgumentParser(description='Update a DNS zone with your '
@@ -64,7 +65,7 @@ def do_update(ip, args):
 
     run = ['nsupdate', '-k', args.key.name]
     if args.verbose:
-        print "%s %% %s\n===\n%s\n===" % (now(), ' '.join(run), script)
+        print "%s %% %s\n===\n%s\n===" % (now(), ' '.join(run), script.strip())
 
     proc = Popen(run, stdin=PIPE)
     proc.stdin.write(script)
