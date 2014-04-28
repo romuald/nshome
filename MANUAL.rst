@@ -11,46 +11,36 @@ Please note that in this document, *domain-name* is a reference to your fully qu
 - `Use nshome script to update your record`_
 - `Troubleshooting`_
 
+
+
 Create a private key
 =======================
 
-First, you will need to create a shared private key that will be used to communicate between the script and your server. Using `dnssec-keygen`__
+First, you will need to create a public/private key pair that will be used to communicate between the script and your server. Using `dnssec-keygen`__
 
 .. __: http://ftp.isc.org/isc/bind9/cur/9.8/doc/arm/man.dnssec-keygen.html
 
-In this example, I choose *hmac-sha256*, but this could be any of the following:  *hmac-md5, hmac-sha1, hmac-sha224, hmac-sha256, hmac-sha384 and hmac-sha512*
-
 ::
 
-  dnssec-keygen -a hmac-sha256  -b 256 -n HOST domain-name.key
+  dnssec-keygen -C -a DSA -b 512 -n HOST -T KEY domain-name
 
-Here *domain-name* is the zone that allows dynamic updates, your domain name in most cases.
-
-Next, grab the private key::
-
-  perl -ne 'print if s/^Key: //' < Kdomain-name*.private
+Here *domain-name* is the zone that allows dynamic updates. Your domain name in most cases.
 
 
-Add your private key to the Bind configuration
-================================================
+Add the public key to your zone
+=====================================
 
-You'll need to enter this key in your Bind configuration file. I usually create a specific file for keys that is only readable by bind: ``/etc/bind/ddns.conf``
+For that, simply copy/paste the contents of the ``Kdomain-name+*.key`` file to your zone configuration.
 
-::
-
-  # Note: the final dot in fqdn isn't mandatory here
-  key domain-name {
-        algorithm HMAC-SHA256;
-        secret "KEY THAT WAS GRABED";
-  };
-
-Then ``chgrp /etc/bind/ddns.conf && chmod 0640 /etc/bind/ddns.conf`` to keep it *(relatively)* safe.
+You might want to prefix it so it won't appear in the root of your domain when queried, for ``example example.com`` -> `_key.example.com`` (this is only to lighten DNS queries, the key is supposed to be public and can be exposed safely)
 
 
 Configure your zone to accept updates from key
 ==================================================
 
-Last step is to tell bind that it should accept DNS updates from your newly created key to update your domain. So, in your ``/etc/bind/named.conf.local``
+Last step is to tell bind that it should accept DNS updates signed with the private counterpart of the public key.
+
+So, in your ``/etc/bind/named.conf.local``
 
 ::
 
@@ -60,6 +50,8 @@ Last step is to tell bind that it should accept DNS updates from your newly crea
     # your standard configuration …
     allow-update { key domain-name ; };
   };
+
+Don't forget the **prefix** if you added one. The *key* parameter here is the name of the record set in the zone.
 
 Finally, reload bind using ``rndc reload`` and you should be set
 
@@ -103,8 +95,9 @@ To avoid the problem of having a zone file messed up (and to avoid forgetting to
 
 Then create another *empty* db file ``db.sub.domain-name`` that Bind can mess up::
 
-  @ IN SOA sub.domain-name admin.email. 2014042601 7200 7200 2419200 1200
-  @ IN NS [server-name]
+  @     IN SOA sub.domain-name admin.email. 2014042601 7200 7200 2419200 1200
+  @     IN NS [server-name]
+  _key  IN KEY … 
 
 
 And another entry in your ``named.conf.local`` (you might wish to remove the *allow-update* from the upper zone)
@@ -114,6 +107,6 @@ And another entry in your ``named.conf.local`` (you might wish to remove the *al
   zone "home.domain-name" {
     type master;
     file "/etc/bind/db.home.domain-name";
-    allow-update { key domain-name ; };
+    allow-update { key _key.home.domain-name ; };
   };
   
