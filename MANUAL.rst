@@ -6,7 +6,7 @@ How to setup your Bind server
 Please note that in this document, *domain-name* is a reference to your fully qualified domain name. For example ``github.com``
 
 - `Create a private key`_
-- `Add your private key to the Bind configuration`_
+- `Add the public key to your zone`_
 - `Configure your zone to accept updates from key`_
 - `Use nshome script to update your record`_
 - `Troubleshooting`_
@@ -32,7 +32,7 @@ Add the public key to your zone
 
 For that, simply copy/paste the contents of the ``Kdomain-name+*.key`` file to your zone configuration.
 
-You might want to prefix it so it won't appear in the root of your domain when queried, for ``example example.com`` -> `_key.example.com`` (this is only to lighten DNS queries, the key is supposed to be public and can be exposed safely)
+You might want to prefix it so it won't appear in the root of your domain when queried, for example ``example.com`` -> ``_key.example.com`` (this is only to lighten DNS queries, the key is supposed to be public and can be exposed safely)
 
 
 Configure your zone to accept updates from key
