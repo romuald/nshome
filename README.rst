@@ -24,7 +24,7 @@ You might wish to checkout the `<MANUAL.rst>`_ file to see how to set up your DN
 
 Since the script needs the nsupdate_ binary, you'll need to install it:
 
-- Debian/Ubuntu: ``apt-get install dnsutils``
+- Debian/Ubuntu: ``apt-get install dnsutils bind9utils``
 - MacOS: ``brew install bind``
 
 
