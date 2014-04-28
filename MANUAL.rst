@@ -32,7 +32,7 @@ Add the public key to your zone
 
 For that, simply copy/paste the contents of the ``Kdomain-name+*.key`` file to your zone configuration.
 
-You might want to prefix it so it won't appear in the root of your domain when queried, for example ``example.com`` -> ``_key.example.com`` (this is only to lighten DNS queries, the key is supposed to be public and can be exposed safely)
+You might want to prefix it so it won't appear in the root of your domain when queried, for example ``example.com.`` 〉 ``_key.example.com.`` (this is only to lighten DNS queries, the key is supposed to be public and can be exposed safely)
 
 
 Configure your zone to accept updates from key
@@ -51,7 +51,7 @@ So, in your ``/etc/bind/named.conf.local``
     allow-update { key domain-name ; };
   };
 
-Don't forget the **prefix** if you added one. The *key* parameter here is the name of the record set in the zone.
+Don't forget the **prefix** before your domain name if you added one. The *key* parameter here is the name of the record set in the zone (also, don't forget the final ``.``)
 
 Finally, reload bind using ``rndc reload`` and you should be set
 
@@ -59,6 +59,7 @@ Finally, reload bind using ``rndc reload`` and you should be set
 Use nshome script to update your record
 ==============================================
 
+Before trying to update your zone, be warned that Bind will probably mess up its contents when doing dynamic updates. To avoid that you can check out the `Troubleshooting`_ section and set up a child zone dedicated to the name you wish to use.
 
 You'll need both key files for nsupdate_ to work, any of them will work from the command line.
 
