@@ -83,9 +83,13 @@ def main():
 
     ip_prev = None
     while True:
-        ip = get_ip()
+        try:
+            ip = get_ip()
+        except socket.error:
+            print 'unable to retrieve IP address'
+            ip = None
 
-        if ip != ip_prev:
+        if ip and ip != ip_prev:
             print "%s IP changed to %s -> UPDATE" % (now(), ip)
             if do_update(ip, args):
                 # If update failed, try again next time, don't wait for IP change
