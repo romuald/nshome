@@ -85,7 +85,7 @@ def main():
     while True:
         try:
             ip = get_ip()
-        except socket.error:
+        except (socket.error, urllib2.HTTPError):
             print 'unable to retrieve IP address'
             ip = None
 
