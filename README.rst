@@ -5,7 +5,7 @@ This script may be used by people having a "dynamic IP" ISP and administrating t
 
 It sends a dynamic update to update a specific record within your DNS zone (using Bind nsupdate_ binary)
 
-.. _nsupdate: http://ftp.isc.org/isc/bind9/cur/9.8/doc/arm/man.nsupdate.html
+.. _nsupdate: http://ftp.isc.org/isc/bind9/cur/9.10/doc/arm/man.nsupdate.html
 
 
 Sample usage::
