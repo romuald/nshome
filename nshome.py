@@ -7,9 +7,14 @@ to update a record to your IP address.
 Mainly useful for people with dynamic IP providers who
 have access to a customised DNS server
 """
+from __future__ import print_function, unicode_literals
+
 import json
 import socket
-import urllib2
+try:
+    from urllib2 import urlopen, Request
+except ImportError:
+    from urllib.request import urlopen, Request
 
 from time import sleep, strftime
 from argparse import ArgumentParser, FileType
@@ -22,6 +27,7 @@ UPDATE DELETE %(name)s A
 UPDATE ADD %(name)s %(ttl)d A %(ip)s
 %(show)sSEND
 """
+
 
 def parseargs():
     parser = ArgumentParser(description='Update a DNS zone with your '
@@ -42,18 +48,23 @@ def parseargs():
 
     return parser.parse_args()
 
+
+def log(msg, level='INFO'):
+    print("%s %s - %s" % (strftime("%Y-%m-%d %H:%M:%S"), level, msg))
+
+
 def get_ip():
     """Retrieve ip from remote service"""
     # Force IPv4
     host4 = socket.gethostbyname(IPHOST)
-    req = urllib2.Request('http://{}/'.format(host4),
-                          headers = {'Host': IPHOST})
+    req = Request('http://{}/'.format(host4), headers={'Host': IPHOST})
 
-    ip = urllib2.urlopen(req).read(128)
+    ip = urlopen(req).read(128).decode('utf-8')
     if ip.count('.') != 3:
         raise RuntimeError('%r not an IPv4?' % (ip, ))
 
     return ip.strip()
+
 
 def do_update(ip, args):
     data = {
@@ -65,18 +76,15 @@ def do_update(ip, args):
 
     run = ['nsupdate', '-k', args.key.name]
     if args.verbose:
-        print "%s %% %s\n===\n%s\n===" % (now(), ' '.join(run), script.strip())
+        log("%s\n=======\n%s\n=======" % (' '.join(run), script.strip()))
 
     proc = Popen(run, stdin=PIPE)
-    proc.stdin.write(script)
+    proc.stdin.write(script.encode('utf-8'))
     proc.stdin.flush()
     proc.stdin.close()
 
     return proc.wait() == 0
 
-def now():
-    # lazy
-    return strftime("%Y-%m-%d %H:%M:%S")
 
 def main():
     args = parseargs()
@@ -85,14 +93,15 @@ def main():
     while True:
         try:
             ip = get_ip()
-        except (socket.error, urllib2.HTTPError):
-            print 'unable to retrieve IP address'
+        except Exception as err:
+            log('unable to retrieve IP address (%r)' % err, 'ERROR')
             ip = None
 
         if ip and ip != ip_prev:
-            print "%s IP changed to %s -> UPDATE" % (now(), ip)
+            log("IP changed to %s -> UPDATE" % ip)
             if do_update(ip, args):
-                # If update failed, try again next time, don't wait for IP change
+                # If update failed, try again next time,
+                # don't wait for IP change
                 ip_prev = ip
 
         if args.poll <= 0:
@@ -102,6 +111,7 @@ def main():
             sleep(60 * args.poll)
         except KeyboardInterrupt:
             break
+
 
 if __name__ == '__main__':
     main()
