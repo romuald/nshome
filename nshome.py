@@ -59,7 +59,7 @@ def get_ip():
     host4 = socket.gethostbyname(IPHOST)
     req = Request('http://{}/'.format(host4), headers={'Host': IPHOST})
 
-    ip = urlopen(req, timemout=30).read(128).decode('utf-8')
+    ip = urlopen(req, timeout=30).read(128).decode('utf-8')
     if ip.count('.') != 3:
         raise RuntimeError('%r not an IPv4?' % (ip, ))
 
